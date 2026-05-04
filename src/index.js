@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { supabase } from './lib/supabase.js';
 import roomRoutes from './rooms/room.routes.js';
+import reservationRoutes from './reservation/reservation.routes.js';
 
 const app = express();
 app.use(cors()); // Supaya React bisa akses backend
@@ -18,6 +19,7 @@ app.get('/api/users', async (req, res) => {
 
 // Register routes
 app.use('/api/rooms', roomRoutes);
+app.use('/api/reservations', reservationRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server jalan di port ${PORT}`));
