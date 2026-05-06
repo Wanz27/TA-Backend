@@ -140,3 +140,44 @@ export const unarchiveRoom = async (roomId) => {
     }
     return data;
 };
+
+/**
+ * Replace all amenities for a room
+ * amenityIds: array of { amenity_id, quantity }
+ */
+export const replaceRoomAmenities = async (roomId, amenityIds) => {
+    // Delete existing
+    const { error: delError } = await supabase
+        .from('room_amenities_map')
+        .delete()
+        .eq('room_id', roomId);
+    if (delError) throw delError;
+
+    if (!amenityIds || amenityIds.length === 0) return;
+
+    const rows = amenityIds.map(({ amenity_id, quantity }) => ({
+        room_id: roomId,
+        amenity_id,
+        quantity: quantity ?? 1,
+    }));
+    const { error } = await supabase.from('room_amenities_map').insert(rows);
+    if (error) throw error;
+};
+
+/**
+ * Replace all rules for a room
+ * ruleIds: array of rule_id numbers
+ */
+export const replaceRoomRules = async (roomId, ruleIds) => {
+    const { error: delError } = await supabase
+        .from('room_rules_map')
+        .delete()
+        .eq('room_id', roomId);
+    if (delError) throw delError;
+
+    if (!ruleIds || ruleIds.length === 0) return;
+
+    const rows = ruleIds.map((rule_id) => ({ room_id: roomId, rule_id }));
+    const { error } = await supabase.from('room_rules_map').insert(rows);
+    if (error) throw error;
+};
