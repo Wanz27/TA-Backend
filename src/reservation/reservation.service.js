@@ -21,12 +21,14 @@ export const getReservationById = async (reservationId) => {
 };
 
 export const createNewReservation = async (reservationData) => {
-    const { user_id, room_id, start_time, end_time, purpose } = reservationData;
+    const { user_id, room_id, start_time, end_time, meeting_title, person_in_charge } = reservationData;
 
     if (!user_id) throw new Error('user_id is required');
     if (!room_id) throw new Error('room_id is required');
     if (!start_time) throw new Error('start_time is required');
     if (!end_time) throw new Error('end_time is required');
+    if (!meeting_title) throw new Error('meeting_title is required');
+    if (!person_in_charge) throw new Error('person_in_charge is required');
 
     const start = new Date(start_time);
     const end = new Date(end_time);
@@ -48,7 +50,8 @@ export const createNewReservation = async (reservationData) => {
         room_id,
         start_time,
         end_time,
-        purpose: purpose || null,
+        meeting_title,
+        person_in_charge,
         status: 'Pending',
         booking_code: generateBookingCode(),
     };
