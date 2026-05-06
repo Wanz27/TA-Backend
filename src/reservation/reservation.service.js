@@ -1,6 +1,6 @@
 import * as reservationRepo from './reservation.repository.js';
 
-const VALID_STATUSES = ['Pending', 'Approved', 'Canceled', 'Rescheduled', 'Completed', 'No Show'];
+const VALID_STATUSES = ['Pending', 'Approved', 'Rejected', 'Cancelled'];
 
 const generateBookingCode = () => {
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -21,12 +21,10 @@ export const getReservationById = async (reservationId) => {
 };
 
 export const createNewReservation = async (reservationData) => {
-    const { user_id, room_id, meeting_title, person_in_charge, start_time, end_time } = reservationData;
+    const { user_id, room_id, start_time, end_time, purpose } = reservationData;
 
     if (!user_id) throw new Error('user_id is required');
     if (!room_id) throw new Error('room_id is required');
-    if (!meeting_title) throw new Error('meeting_title is required');
-    if (!person_in_charge) throw new Error('person_in_charge is required');
     if (!start_time) throw new Error('start_time is required');
     if (!end_time) throw new Error('end_time is required');
 
@@ -39,9 +37,6 @@ export const createNewReservation = async (reservationData) => {
     if (start >= end) {
         throw new Error('start_time must be before end_time');
     }
-    if (start <= new Date()) {
-        throw new Error('start_time must be in the future');
-    }
 
     const conflicts = await reservationRepo.findOverlappingReservations(room_id, start_time, end_time);
     if (conflicts.length > 0) {
@@ -51,10 +46,9 @@ export const createNewReservation = async (reservationData) => {
     const payload = {
         user_id,
         room_id,
-        meeting_title,
-        person_in_charge,
         start_time,
         end_time,
+        purpose: purpose || null,
         status: 'Pending',
         booking_code: generateBookingCode(),
     };
@@ -122,7 +116,7 @@ export const cancelReservation = async (reservationId) => {
         throw new Error(`Cannot cancel a reservation with status '${existing.status}'`);
     }
 
-    return await reservationRepo.updateReservation(reservationId, { status: 'Canceled' });
+    return await reservationRepo.updateReservation(reservationId, { status: 'Cancelled' });
 };
 
 export const removeReservation = async (reservationId) => {
