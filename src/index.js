@@ -1,23 +1,15 @@
 // backend/index.js
 import express from 'express';
 import cors from 'cors';
-import { supabase } from './lib/supabase.js';
+import authRoutes from './auth/auth.routes.js';
 import roomRoutes from './rooms/room.routes.js';
 import reservationRoutes from './reservation/reservation.routes.js';
 
 const app = express();
-app.use(cors()); // Supaya React bisa akses backend
+app.use(cors());
 app.use(express.json());
 
-// Contoh route untuk mengambil data dari tabel 'users'
-app.get('/api/users', async (req, res) => {
-  const { data, error } = await supabase.from('users').select('*');
-  
-  if (error) return res.status(400).json({ error: error.message });
-  res.json(data);
-});
-
-// Register routes
+app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/reservations', reservationRoutes);
 
