@@ -63,3 +63,8 @@ export const checkNim = async (nim) => {
     const exists = await authRepo.departmentExists(nim);
     return { exists };
 };
+
+export const checkEmail = async (email) => {
+    const exists = await authRepo.emailExists(email);
+    return { exists };
+};
